@@ -18,6 +18,9 @@ import org.example.demo.colours.Colour;
 import org.example.demo.command.*;
 
 import javafx.scene.paint.Color;
+import org.example.demo.figures.Circle;
+import org.example.demo.figures.Figure;
+import org.example.demo.figures.Rectangle;
 
 import java.util.Stack;
 
@@ -26,6 +29,8 @@ public class DrawingApp extends Application {
     private DrawingCanvas drawingCanvas;
     private Brush currentBrush = new CircleBrush();
     private Brush baseBrush = new CircleBrush();
+    private Figure currentFigure;
+    private double startX, startY;
 
     @Override
     public void start(Stage stage) {
@@ -50,18 +55,45 @@ public class DrawingApp extends Application {
             commandHistory.push(command);
         });
 
+        canvas.setOnMousePressed(e -> {
+            if (currentFigure != null) {
+                currentBrush = new Opacity(new Size(baseBrush, 0), 0);
+            }
+
+            startX = e.getX();
+            startY = e.getY();
+        });
+        canvas.setOnMouseReleased(e -> {
+            if(currentFigure != null) {
+                currentFigure.draw(drawingCanvas.getCanvas().getGraphicsContext2D(), startX, startY, e.getX(), e.getY());
+            }
+        });
+
         Button circleBrushBtn = new Button("Circle Brush");
         circleBrushBtn.setOnAction(e -> {
+            currentFigure = null;
+
             baseBrush = new CircleBrush();
             currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), opacitySlider.getValue());
         });
 
         Button squareBrushBtn = new Button("Square Brush");
         squareBrushBtn.setOnAction(e -> {
+            currentFigure = null;
+
             baseBrush = new SquareBrush();
             currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), opacitySlider.getValue());
         });
 
+        Button rectangleBtn = new Button("Rectangle");
+        rectangleBtn.setOnAction(e -> {
+            currentFigure = new Rectangle();
+        });
+
+        Button circleBtn = new Button("Circle");
+        circleBtn.setOnAction(e -> {
+            currentFigure = new Circle();
+        });
 
         Button undoBtn = new Button("Undo");
         undoBtn.setOnAction(e -> {
@@ -87,6 +119,8 @@ public class DrawingApp extends Application {
 
         VBox root = new VBox(10,
                 canvas,
+                rectangleBtn,
+                circleBtn,
                 circleBrushBtn,
                 squareBrushBtn,
                 undoBtn,
