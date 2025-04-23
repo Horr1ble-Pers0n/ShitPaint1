@@ -6,9 +6,11 @@ public class Colour {
     private static Colour instance;
     private Color currentColor ;
 
-    private Colour(){}
+    private Colour(){
+        currentColor = Color.BLACK;
+    }
 
-    public static synchronized Colour getInstance() {
+    public static Colour getInstance() {
         if(instance == null) {
             instance = new Colour();
         }
