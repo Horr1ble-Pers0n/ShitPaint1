@@ -25,7 +25,7 @@ public class DrawingApp extends Application {
     private final Stack<DrawCommand> commandHistory = new Stack<>();
     private DrawingCanvas drawingCanvas;
     private Brush currentBrush = new CircleBrush();
-    private double currentBrushSize;
+    private Brush baseBrush = new CircleBrush();
 
     @Override
     public void start(Stage stage) {
@@ -51,10 +51,17 @@ public class DrawingApp extends Application {
         });
 
         Button circleBrushBtn = new Button("Circle Brush");
-        circleBrushBtn.setOnAction(e -> currentBrush = new Size(new CircleBrush(), currentBrushSize));
+        circleBrushBtn.setOnAction(e -> {
+            baseBrush = new CircleBrush();
+            currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), opacitySlider.getValue());
+        });
 
         Button squareBrushBtn = new Button("Square Brush");
-        squareBrushBtn.setOnAction(e -> currentBrush = new Size(new SquareBrush(), currentBrushSize));
+        squareBrushBtn.setOnAction(e -> {
+            baseBrush = new SquareBrush();
+            currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), opacitySlider.getValue());
+        });
+
 
         Button undoBtn = new Button("Undo");
         undoBtn.setOnAction(e -> {
@@ -71,21 +78,11 @@ public class DrawingApp extends Application {
                 });
 
         sizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            currentBrushSize = newVal.doubleValue();
-            if (currentBrush instanceof Size s) {
-                s.setSize(currentBrushSize);
-            } else {
-                currentBrush = new Size(currentBrush, currentBrushSize);
-            }
+            currentBrush = new Opacity(new Size(baseBrush, newVal.doubleValue()), opacitySlider.getValue());
         });
 
         opacitySlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            double opacityValue = newVal.doubleValue();
-            if (currentBrush instanceof Opacity opacityBrush) {
-                opacityBrush.setOpacity(opacityValue);
-            } else {
-                currentBrush = new Opacity(currentBrush, opacityValue);
-            }
+            currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), newVal.doubleValue());
         });
 
         VBox root = new VBox(10,
@@ -94,12 +91,8 @@ public class DrawingApp extends Application {
                 squareBrushBtn,
                 undoBtn,
                 colorPicker,
-
-                sizeLabel,
-                sizeSlider,
-
-                opacityLabel,
-                opacitySlider
+                sizeLabel, sizeSlider,
+                opacityLabel, opacitySlider
         );
         Scene scene = new Scene(root);
         stage.setScene(scene);

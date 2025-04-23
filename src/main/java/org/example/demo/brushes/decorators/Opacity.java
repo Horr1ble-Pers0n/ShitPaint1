@@ -23,11 +23,12 @@ public class Opacity extends BrushDecorator {
 
     @Override
     public void draw(GraphicsContext gc, double x, double y) {
-        Color currentColor = Colour.getInstance().getCurrentColor();
-        Color newColor = currentColor.deriveColor(0, 1, 1, opacity);
-
-        gc.setFill(newColor);
+        Color color = Colour.getInstance().getCurrentColor();
+        Color newColor = color.deriveColor(0, 1, 1, opacity);
+        Colour.getInstance().setCurrentColor(newColor);
 
         decoratedBrush.draw(gc, x, y);
+
+        Colour.getInstance().setCurrentColor(color);
     }
 }
