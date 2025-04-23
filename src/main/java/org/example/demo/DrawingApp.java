@@ -3,10 +3,7 @@ package org.example.demo;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -35,6 +32,11 @@ public class DrawingApp extends Application {
     @Override
     public void start(Stage stage) {
         drawingCanvas = new DrawingCanvas(600, 400);
+
+        ComboBox<String> brushComboBox = new ComboBox<>();
+        brushComboBox.getItems().addAll("◯ Circle Brush", "☐ Square Brush");
+        brushComboBox.setValue("◯ Circle Brush");
+
 
         Slider sizeSlider = new Slider(1, 30, 15);
         Label sizeLabel = new Label("Size:");
@@ -69,19 +71,12 @@ public class DrawingApp extends Application {
             }
         });
 
-        Button circleBrushBtn = new Button("Circle Brush");
-        circleBrushBtn.setOnAction(e -> {
-            currentFigure = null;
-
-            baseBrush = new CircleBrush();
-            currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), opacitySlider.getValue());
-        });
-
-        Button squareBrushBtn = new Button("Square Brush");
-        squareBrushBtn.setOnAction(e -> {
-            currentFigure = null;
-
-            baseBrush = new SquareBrush();
+        brushComboBox.setOnAction(e -> {
+            String selected = brushComboBox.getValue();
+            baseBrush = switch (selected) {
+                case "☐ Square Brush" -> new SquareBrush();
+                default -> new CircleBrush();
+            };
             currentBrush = new Opacity(new Size(baseBrush, sizeSlider.getValue()), opacitySlider.getValue());
         });
 
@@ -119,10 +114,9 @@ public class DrawingApp extends Application {
 
         VBox root = new VBox(10,
                 canvas,
+                brushComboBox,
                 rectangleBtn,
                 circleBtn,
-                circleBrushBtn,
-                squareBrushBtn,
                 undoBtn,
                 colorPicker,
                 sizeLabel, sizeSlider,
