@@ -72,6 +72,7 @@ public class DrawingApp extends Application {
         });
 
         brushComboBox.setOnAction(e -> {
+            currentFigure = null;
             String selected = brushComboBox.getValue();
             baseBrush = switch (selected) {
                 case "☐ Square Brush" -> new SquareBrush();
